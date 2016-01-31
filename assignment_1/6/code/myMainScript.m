@@ -2,11 +2,11 @@
 
 tic;
 %This correspond to p1 - 3xn
-img1 = importdata('../data/Features2D_dataset1.mat');
+img1 = importdata('../data/Features2D_dataset2.mat');
 p1 = img1(1:2, :)';
 
 %This correspond to p - 4xn
-img2 = importdata('../data/Features3D_dataset1.mat');
+img2 = importdata('../data/Features3D_dataset2.mat');
 p = img2(1:3, :)';
 
 n = size(img1, 2);
@@ -39,6 +39,6 @@ M = reshape(m, 4, 3)';
 p1val = M * img2;
 p1val = p1val ./ p1val(3,:);
 
-norm(p1val - img1)/sqrt(norm(p1val) * norm(img1))
+norm(p1val - img1)/sqrt(norm(p1val) * norm(img1)) *100
 
 toc;
