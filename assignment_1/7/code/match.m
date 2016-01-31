@@ -36,26 +36,36 @@ for i = 1 : size(des1,1)
       match(i) = 0;
    end
 end
-
+% 
 % % Create a new image showing the two images side by side.
-% im3 = appendimages(im1,im2);
+% im3 = appendimages(image1,image2);
 % 
 % % Show a figure with lines joining the accepted matches.
 % figure('Position', [100 100 size(im3,2) size(im3,1)]);
 % colormap('gray');
 % imagesc(im3);
 % hold on;
-% cols1 = size(im1,2);
-% for i = 1: size(des1,1)
-%   if (match(i) > 0)
+% cols1 = size(image1,2);
+siz=find(match>0);
+p1=zeros(length(siz),2);
+p2=zeros(length(siz),2);
+j=1;
+for i = 1: size(des1,1)
+  if (match(i) > 0)
+      p1(j,:) =round(loc1(i,[1,2]));
+      p2(j,:) =round(loc2(match(i),[1,2]));
+      
 %     line([loc1(i,2) loc2(match(i),2)+cols1], ...
 %          [loc1(i,1) loc2(match(i),1)], 'Color', 'c');
-%   end
-% end
+%     line([p1(j,2) p2(j,2)+cols1], ...
+%          [p1(j,1) p2(j,1)], 'Color', 'c');
+     j=j+1;
+  end
+end
 % hold off;
-j=find(match>0);
-p1 = round(loc1(j,[1,2]));
-p2 = round(loc1(j,[1,2]));
+% j=find(match>0);
+% p1 = round(loc1(j,[1,2]));
+% p2 = round(loc2(j,[1,2]));
 
 
 
