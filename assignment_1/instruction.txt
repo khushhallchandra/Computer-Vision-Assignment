@@ -1,0 +1,35 @@
+Folder -> 1to5
+It contains the solution for the problems 1 to 5
+
+Folder -> 6
+
+- Code
+It contains code for the 3 parts
+1. dataset1
+2. dataset2
+3. noisy dataset2
+
+- Report
+It contains
+1. Three pdf reports corresponding to each part
+2. Comments.txt -> comments about the result we got
+
+Folder -> 7
+
+- Code
+It contains code for the 2 parts
+1. Q7a
+2. Q7b
+3. myRevWrap
+
+We also modified the original file 
+of match.m and sift.m
+
+Other files were taken from the SiftDemo
+
+- Report
+It contains
+1. 7a - html report
+2. 7b - html report
+
+

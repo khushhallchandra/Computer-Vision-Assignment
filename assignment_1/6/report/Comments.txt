@@ -1,0 +1,17 @@
+Comments about the answer :
+
+In the third case, when we added gaussian noise we got error of ~6%
+Calculate the error between the original (without noise) image and 
+the one calculated by using matrix M.
+
+Whereas in the second case we got error of about 0.15% .This reult is
+obvious, since due to addition of noise the mapping between image
+coordinate and 3d object point gets less accurate.
+
+In the first case, we get a very small error ~0 . It is our speculation 
+that in this case the data given was perfectly matched (i.e. mapping
+between image coordinate and 3d object point)
+
+
+
+
