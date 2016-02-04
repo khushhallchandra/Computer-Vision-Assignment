@@ -1,7 +1,5 @@
 %% Q7a
 
-tic;
-
 img = imread('../data/goi1_downsampled.jpg');
 H   = importdata('../data/Hmodel.mat');
 
@@ -30,6 +28,7 @@ imNew = myRevWrap(im2, inv(M));
 subplot(1,3,1);imshow(img);
 subplot(1,3,2);imshow(im2);
 subplot(1,3,3);imshow(imNew);
+% printing the model
+H
 % printing Homographic matrix
 M 
-toc;
