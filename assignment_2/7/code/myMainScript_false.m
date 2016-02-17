@@ -1,4 +1,7 @@
 %% MyMainScript2
+
+% In this case we do a large translation
+% Hence we are getting misaligned image this time
 flash = double(imread('../data/barbara.png'));
 %flash = flash(1:2:end,1:2:end);
 
@@ -7,7 +10,7 @@ noflash = double(imread('../data/negative_barbara.png'));
 
 %applying transformations
 noflash = double(imrotate(noflash, 28.5, 'nearest', 'crop'));
-noflash = imtranslate(noflash, -2);
+noflash = imtranslate(noflash, -50);
 
 noflash = double(noflash) + 10.*(randn(size(noflash))); 
 noflash(noflash<0) = 0;
@@ -29,6 +32,7 @@ surf(X,Y,ijEnt');
 [ang,t]=find(ijEnt==min(min(ijEnt)));
 
 finalIm=imrotate(imtranslate(noflash,t-13),ang-61,'nearest','crop');
+%% Misaligned output
 figure ,imshow(uint8(flash))
 title('original flash image')
 figure ,imshow(uint8(noflash))

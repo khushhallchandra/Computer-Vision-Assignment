@@ -1,0 +1,25 @@
+Folder -> 1to5
+
+It contains solution for the written question 1to5.
+
+Folder -> 6
+
+- Code
+
+Contains the relevant code
+
+- Report
+
+It contains the html report
+
+Folder -> 7
+
+- Code
+It contains code for the 3 parts
+1. flash/noflash image
+2. barbara/negative_barbara image
+3. misaligned barbara/negative_barbara image
+
+- Report
+It contains 3 html reports corresponding to each part
+

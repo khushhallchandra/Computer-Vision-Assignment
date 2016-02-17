@@ -55,3 +55,12 @@ subplot(1,4,2);imshow(img2);
 subplot(1,4,3:4);imshow(img1New);
 
 toc;
+
+%% Reason for the normalization step
+% The matrix involved in the calculation of Homography Matrix, 
+% contains the multiplication of the points which makes this matrix 
+% sensitive to noise present in the calculation of point correspondance.
+% This means the solution will also be sensitive to noise in the points 
+% (even if there are no outliers). So we do normalization of the points 
+% to reduce this affect.
+

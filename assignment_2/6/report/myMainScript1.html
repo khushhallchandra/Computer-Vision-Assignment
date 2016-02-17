@@ -65,7 +65,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Q6</a></li><li><a href="#2">tajnew</a></li><li><a href="#3">tajold</a></li><li><a href="#4">Hostel-6</a></li></ul></div><h2>Q6<a name="1"></a></h2><pre class="codeinput">tic;
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Q6</a></li><li><a href="#2">tajnew</a></li><li><a href="#3">tajold</a></li><li><a href="#4">Hostel-6</a></li><li><a href="#5">Reason for the normalization step</a></li></ul></div><h2>Q6<a name="1"></a></h2><pre class="codeinput">tic;
 </pre><h2>tajnew<a name="2"></a></h2><pre class="codeinput">img1 = imread(<span class="string">'../data/tajnew1_downsampled.jpg'</span>);
 img2 = imread(<span class="string">'../data/tajnew2_downsampled.jpg'</span>);
 
@@ -83,7 +83,9 @@ subplot(1,7,1:2);imshow(img1);
 subplot(1,7,3:4);imshow(img2);
 subplot(1,7,5:7);imshow(img1New);
 
-</pre><img vspace="5" hspace="5" src="tajnew_mosaic.jpg" alt="" style="width:1404px;height:828px"> <h2>tajold<a name="3"></a></h2><pre class="codeinput">img1 = imread(<span class="string">'../data/tajold1_downsampled.jpg'</span>);
+</pre><img vspace="5" hspace="5" src="tajnew_mosaic.jpg" alt="" style="width:1404px;height:828px"> 
+<h2>tajold<a name="3"></a></h2>
+<pre class="codeinput">img1 = imread(<span class="string">'../data/tajold1_downsampled.jpg'</span>);
 img2 = imread(<span class="string">'../data/tajold2_downsampled.jpg'</span>);
 
 img1=img1(:,:,1);
@@ -99,7 +101,9 @@ figure();
 subplot(1,7,1:2);imshow(img1);
 subplot(1,7,3:4);imshow(img2);
 subplot(1,7,5:7);imshow(img1New); 
-</pre><img vspace="5" hspace="5" src="tajold_mosaic.jpg" alt="" style="width:1404px;height:828px"> <h2>Hostel-6<a name="4"></a></h2><pre class="codeinput">img1 = imread(<span class="string">'../data/Hostel61.jpg'</span>);
+</pre><img vspace="5" hspace="5" src="tajold_mosaic.jpg" alt="" style="width:1404px;height:828px"> 
+<h2>Hostel-6<a name="4"></a></h2>
+<pre class="codeinput">img1 = imread(<span class="string">'../data/Hostel61.jpg'</span>);
 img2 = imread(<span class="string">'../data/Hostel62.jpg'</span>);
 
 img1=img1(:,:,1);
@@ -119,7 +123,15 @@ subplot(1,4,3:4);imshow(img1New);
 toc;
 
 Elapsed time is 14.927008 seconds.
-</pre><img vspace="5" hspace="5" src="Hostel6_mosaic.jpg" alt="" style="width:1404px;height:828px"> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+</pre><img vspace="5" hspace="5" src="Hostel6_mosaic.jpg" alt="" style="width:1404px;height:828px"> 
+<h2>Reason for the normalization step<a name="5"></a></h2>
+The matrix involved in the calculation of Homography Matrix, contains the multiplication of the points 
+which makes this matrix sensitive to noise present in the calculation of point correspondance.
+This means the solution will also be sensitive to noise in the points (even if there are no outliers).
+So we do normalization of the points to reduce this affect.
+
+<p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+
 ##### SOURCE BEGIN #####
 %% Q6
 tic;
