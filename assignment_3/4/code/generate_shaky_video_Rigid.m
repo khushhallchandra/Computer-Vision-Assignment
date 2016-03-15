@@ -1,23 +1,23 @@
 clear;
-
-a = mmread('..\data\sampleVideo\cars.avi');
+addpath mmread;
+a = mmread('..\data\sampleVideo\coastguard.avi');
 framerate = a.rate;
 vid = zeros(a.height,a.width,a.nrFramesTotal);
 
 for i=1:a.nrFramesTotal 
     b = rgb2gray(a.frames(i).cdata); 
     [H,W] = size(b);
-    if i > 1, tx = round(rand(1)*3); else tx = 0; end;
-    if i > 1, ty = round(rand(1)*3); else ty = 0; end;
-    if i > 1,theta(i) = randn(1)*2;else theta(i) = 0; end;
+    if i > 1, tx = round(rand(1)*4); else tx = 0; end;
+    if i > 1, ty = round(rand(1)*4); else ty = 0; end;
+    if i > 1,theta = round(rand(1)*6); else theta = 0; end;
            
-    c = imrotate(b,theta(i),'bilinear','crop');    
+    c = imrotate(b,theta,'bilinear','crop');    
     d = c; d(:,:) = 0;
     d(ty+1:H,tx+1:W) = c(1:H-ty,1:W-tx);
         
     vid(:,:,i) = d;
 end
   
-filename = '..\data\shakyRigid\shaky_cars.avi';
+filename = '..\data\shakyRigid\shaky_coastguard.avi';
 writevideo(filename,vid/max(vid(:)),framerate);
     

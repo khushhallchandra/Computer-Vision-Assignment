@@ -1,0 +1,7 @@
+-If we zoom in or zoom out in the video then we can't estimate its motion using our motion model.
+-If we have a high illumination changes between two frames( means light is suddenly turned ON or OFF).
+-If we don't have any overlapping area between the 2 frames (such as change of scene) then we can't 
+ find the matched points between the frames hence we can't estimate the relative motion.
+-In case of very weak feature points (means constant intensity region),we will have very less feature
+ points and if it gets less than the degree of freedom of our motion model then we can't estimate 
+ the motion either.

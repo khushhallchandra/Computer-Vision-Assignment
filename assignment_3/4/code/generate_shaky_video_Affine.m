@@ -1,6 +1,6 @@
 clear;
 
-a = mmread('..\data\sampleVideo\cars.avi');
+a = mmread('..\data\sampleVideo\gbus.avi');
 framerate = a.rate;
 vid = zeros(a.height,a.width,a.nrFramesTotal);
 
@@ -14,14 +14,15 @@ for i=1:a.nrFramesTotal
     else
         A = [1 0; 0 1];
     end;
-           
-    c = my_affine_warp(b,A);    
+    B=eye(3);
+    B(1:2,1:2)=A;       
+    c = my_affine_warp(b,B);    
     d = c; d(:,:) = 0;
     d(ty+1:H,tx+1:W) = c(1:H-ty,1:W-tx);
         
     vid(:,:,i) = d;
 end
   
-filename = '..\data\shakyAffine\shaky_cars.avi';
+filename = '..\data\shakyAffine\shaky_gbus.avi';
 writevideo(filename,vid/max(vid(:)),framerate);
     

@@ -1,0 +1,454 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>main_translation</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-03-13"><meta name="DC.source" content="main_translation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Cars</a></li><li><a href="#3">Coastguard</a></li><li><a href="#4">gbus</a></li></ul></div><pre class="codeinput">addpath <span class="string">mmread</span>;
+</pre><h2>Cars<a name="2"></a></h2><pre class="codeinput">tic;
+<span class="comment">%* Reading video*</span>
+inVideo = mmread(<span class="string">'..\data\shakyTranslation\shaky_cars.avi'</span>);
+totFrames = inVideo.nrFramesTotal;
+framerate = inVideo.rate;
+video = zeros(inVideo.height, inVideo.width, totFrames);
+stablized_video = zeros(inVideo.height, inVideo.width, totFrames);
+<span class="comment">% cdata       [height X width X 3] uint8 matricies</span>
+<span class="keyword">for</span> i  = 1:totFrames
+    video(:,:,i) = inVideo.frames(i).cdata(:,:,1);
+<span class="keyword">end</span>
+
+<span class="comment">% Finding the translational motion model</span>
+tx = zeros(1,totFrames);
+ty = zeros(1,totFrames);
+
+<span class="comment">% Using RANSAC</span>
+<span class="comment">% [ des1, loc1] = sift(video(:,:,1));</span>
+<span class="comment">% for i = 2:totFrames</span>
+<span class="comment">%     [ des2, loc2] = sift(video(:,:,i));</span>
+<span class="comment">%     [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),des1, loc1,video(:,:,i),des2, loc2,'RANSAC' );</span>
+<span class="comment">%     des1=des2; loc1=loc2;</span>
+<span class="comment">% end</span>
+
+<span class="comment">% Using Least Square</span>
+<span class="keyword">for</span> i = 2:totFrames
+    [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),0, 0,video(:,:,i),0, 0,<span class="string">'LS'</span> );
+<span class="keyword">end</span>
+
+<span class="comment">% Smoothning and finding the final translation of each frames from its stable position</span>
+a= 1:totFrames;
+smoothtx=mySmoothMotion(tx);
+smoothty=mySmoothMotion(ty);
+plot(a,tx,a,smoothtx);title(<span class="string">'tx'</span>);
+figure();plot(a,ty,a,smoothty);title(<span class="string">'ty'</span>);
+
+txfinal=tx;tyfinal=ty;
+txfinal(:)=0;tyfinal(:)=0;
+<span class="keyword">for</span> i = 2:totFrames
+    txfinal(i)=tx(i)-smoothtx(i)+txfinal(i-1);
+    tyfinal(i)=ty(i)-smoothty(i)+tyfinal(i-1);
+<span class="keyword">end</span>
+txfinal=round(txfinal);tyfinal=round(tyfinal);
+
+
+<span class="comment">% Forming stablized video</span>
+[H,W]=size(video(:,:,1));
+<span class="keyword">for</span> i  = 1:totFrames
+    d = video(:,:,i); d(:,:) = 0;
+    d(max(1,1-tyfinal(i)):min(H-tyfinal(i),H),max(1,1-txfinal(i)):min(W-txfinal(i),W)) = <span class="keyword">...</span>
+    video(max(1,1+tyfinal(i)):min(H,H+tyfinal(i)),max(1,1+txfinal(i)):min(W,W+txfinal(i)),i);
+    stablized_video(:,:,i) = d;
+<span class="keyword">end</span>
+<span class="comment">% filename = '..\report\stablizedTranslation\stablized_cars_RANSAC.avi';</span>
+filename = <span class="string">'..\report\stablizedTranslation\stablized_cars_LS.avi'</span>;
+bothvideo = zeros(inVideo.height, 2*inVideo.width, totFrames);
+bothvideo(:,1:W,:)=video(:,:,:);
+bothvideo(:,W+1:2*W,:)=stablized_video(:,:,:);
+writevideo(filename,bothvideo/max(bothvideo(:)),framerate);
+toc;
+</pre><pre class="codeoutput">Elapsed time is 108.557377 seconds.
+</pre><img vspace="5" hspace="5" src="main_translation_01.png" alt=""> <img vspace="5" hspace="5" src="main_translation_02.png" alt=""> <h2>Coastguard<a name="3"></a></h2><pre class="codeinput">tic;
+<span class="comment">%* Reading video*</span>
+inVideo = mmread(<span class="string">'..\data\shakyTranslation\shaky_coastguard.avi'</span>);
+totFrames = inVideo.nrFramesTotal;
+framerate = inVideo.rate;
+video = zeros(inVideo.height, inVideo.width, totFrames);
+stablized_video = zeros(inVideo.height, inVideo.width, totFrames);
+<span class="comment">% cdata       [height X width X 3] uint8 matricies</span>
+<span class="keyword">for</span> i  = 1:totFrames
+    video(:,:,i) = inVideo.frames(i).cdata(:,:,1);
+<span class="keyword">end</span>
+
+<span class="comment">% Finding the translational motion model</span>
+tx = zeros(1,totFrames);
+ty = zeros(1,totFrames);
+
+<span class="comment">% Using RANSAC</span>
+<span class="comment">% [ des1, loc1] = sift(video(:,:,1));</span>
+<span class="comment">% for i = 2:totFrames</span>
+<span class="comment">%     [ des2, loc2] = sift(video(:,:,i));</span>
+<span class="comment">%     [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),des1, loc1,video(:,:,i),des2, loc2,'RANSAC' );</span>
+<span class="comment">%     des1=des2; loc1=loc2;</span>
+<span class="comment">% end</span>
+
+<span class="comment">% Using Least Square</span>
+<span class="keyword">for</span> i = 2:totFrames
+    [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),0, 0,video(:,:,i),0, 0,<span class="string">'LS'</span> );
+<span class="keyword">end</span>
+
+<span class="comment">% Smoothning and finding the final translation of each frames from its stable position</span>
+a= 1:totFrames;
+smoothtx=mySmoothMotion(tx);
+smoothty=mySmoothMotion(ty);
+plot(a,tx,a,smoothtx);title(<span class="string">'tx'</span>);
+figure();plot(a,ty,a,smoothty);title(<span class="string">'ty'</span>);
+
+txfinal=tx;tyfinal=ty;
+txfinal(:)=0;tyfinal(:)=0;
+<span class="keyword">for</span> i = 2:totFrames
+    txfinal(i)=tx(i)-smoothtx(i)+txfinal(i-1);
+    tyfinal(i)=ty(i)-smoothty(i)+tyfinal(i-1);
+<span class="keyword">end</span>
+txfinal=round(txfinal);tyfinal=round(tyfinal);
+
+
+<span class="comment">% Forming stablized video</span>
+[H,W]=size(video(:,:,1));
+<span class="keyword">for</span> i  = 1:totFrames
+    d = video(:,:,i); d(:,:) = 0;
+    d(max(1,1-tyfinal(i)):min(H-tyfinal(i),H),max(1,1-txfinal(i)):min(W-txfinal(i),W)) = <span class="keyword">...</span>
+    video(max(1,1+tyfinal(i)):min(H,H+tyfinal(i)),max(1,1+txfinal(i)):min(W,W+txfinal(i)),i);
+    stablized_video(:,:,i) = d;
+<span class="keyword">end</span>
+<span class="comment">% filename = '..\report\stablizedTranslation\stablized_coastguard_RANSAC.avi';</span>
+filename = <span class="string">'..\report\stablizedTranslation\stablized_coastguard_LS.avi'</span>;
+bothvideo = zeros(inVideo.height, 2*inVideo.width, totFrames);
+bothvideo(:,1:W,:)=video(:,:,:);
+bothvideo(:,W+1:2*W,:)=stablized_video(:,:,:);
+writevideo(filename,bothvideo/max(bothvideo(:)),framerate);
+toc;
+</pre><pre class="codeoutput">Elapsed time is 33.350657 seconds.
+</pre><img vspace="5" hspace="5" src="main_translation_03.png" alt=""> <img vspace="5" hspace="5" src="main_translation_04.png" alt=""> <h2>gbus<a name="4"></a></h2><pre class="codeinput">tic;
+<span class="comment">%* Reading video*</span>
+inVideo = mmread(<span class="string">'..\data\shakyTranslation\shaky_gbus.avi'</span>);
+totFrames = inVideo.nrFramesTotal;
+framerate = inVideo.rate;
+video = zeros(inVideo.height, inVideo.width, totFrames);
+stablized_video = zeros(inVideo.height, inVideo.width, totFrames);
+<span class="comment">% cdata       [height X width X 3] uint8 matricies</span>
+<span class="keyword">for</span> i  = 1:totFrames
+    video(:,:,i) = inVideo.frames(i).cdata(:,:,1);
+<span class="keyword">end</span>
+
+<span class="comment">% Finding the translational motion model</span>
+tx = zeros(1,totFrames);
+ty = zeros(1,totFrames);
+
+<span class="comment">% Using RANSAC</span>
+<span class="comment">% [ des1, loc1] = sift(video(:,:,1));</span>
+<span class="comment">% for i = 2:totFrames</span>
+<span class="comment">%     [ des2, loc2] = sift(video(:,:,i));</span>
+<span class="comment">%     [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),des1, loc1,video(:,:,i),des2, loc2,'RANSAC' );</span>
+<span class="comment">%     des1=des2; loc1=loc2;</span>
+<span class="comment">% end</span>
+
+<span class="comment">% Using Least Square</span>
+<span class="keyword">for</span> i = 2:totFrames
+    [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),0, 0,video(:,:,i),0, 0,<span class="string">'LS'</span> );
+<span class="keyword">end</span>
+
+<span class="comment">% Smoothning and finding the final translation of each frames from its stable position</span>
+a= 1:totFrames;
+smoothtx=mySmoothMotion(tx);
+smoothty=mySmoothMotion(ty);
+plot(a,tx,a,smoothtx);title(<span class="string">'tx'</span>);
+figure();plot(a,ty,a,smoothty);title(<span class="string">'ty'</span>);
+
+txfinal=tx;tyfinal=ty;
+txfinal(:)=0;tyfinal(:)=0;
+<span class="keyword">for</span> i = 2:totFrames
+    txfinal(i)=tx(i)-smoothtx(i)+txfinal(i-1);
+    tyfinal(i)=ty(i)-smoothty(i)+tyfinal(i-1);
+<span class="keyword">end</span>
+txfinal=round(txfinal);tyfinal=round(tyfinal);
+
+
+<span class="comment">% Forming stablized video</span>
+[H,W]=size(video(:,:,1));
+<span class="keyword">for</span> i  = 1:totFrames
+    d = video(:,:,i); d(:,:) = 0;
+    d(max(1,1-tyfinal(i)):min(H-tyfinal(i),H),max(1,1-txfinal(i)):min(W-txfinal(i),W)) = <span class="keyword">...</span>
+    video(max(1,1+tyfinal(i)):min(H,H+tyfinal(i)),max(1,1+txfinal(i)):min(W,W+txfinal(i)),i);
+    stablized_video(:,:,i) = d;
+<span class="keyword">end</span>
+<span class="comment">%filename = '..\report\stablizedTranslation\stablized_gbus_RANSAC.avi';</span>
+filename = <span class="string">'..\report\stablizedTranslation\stablized_gbus_LS.avi'</span>;
+bothvideo = zeros(inVideo.height, 2*inVideo.width, totFrames);
+bothvideo(:,1:W,:)=video(:,:,:);
+bothvideo(:,W+1:2*W,:)=stablized_video(:,:,:);
+writevideo(filename,bothvideo/max(bothvideo(:)),framerate);
+
+<span class="comment">% Motion can be modelled in 3 ways</span>
+<span class="comment">% fitTranslation -&gt; It will return tx &amp; ty only</span>
+<span class="comment">% fitTranslation_Rotation -&gt; It will return theta, tx &amp; ty</span>
+<span class="comment">% fitAffine -&gt; 3x3 matrix</span>
+
+toc;
+</pre><pre class="codeoutput">
+Elapsed time is 60.222241 seconds.
+</pre><img vspace="5" hspace="5" src="main_translation_05.png" alt=""> <img vspace="5" hspace="5" src="main_translation_06.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+addpath mmread;
+%% Cars
+tic;
+%* Reading video*
+inVideo = mmread('..\data\shakyTranslation\shaky_cars.avi');
+totFrames = inVideo.nrFramesTotal;
+framerate = inVideo.rate;
+video = zeros(inVideo.height, inVideo.width, totFrames);
+stablized_video = zeros(inVideo.height, inVideo.width, totFrames);
+% cdata       [height X width X 3] uint8 matricies
+for i  = 1:totFrames
+    video(:,:,i) = inVideo.frames(i).cdata(:,:,1);
+end
+
+% Finding the translational motion model
+tx = zeros(1,totFrames);
+ty = zeros(1,totFrames);
+
+% Using RANSAC
+% [ des1, loc1] = sift(video(:,:,1));
+% for i = 2:totFrames
+%     [ des2, loc2] = sift(video(:,:,i));
+%     [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),des1, loc1,video(:,:,i),des2, loc2,'RANSAC' );
+%     des1=des2; loc1=loc2;
+% end
+
+% Using Least Square
+for i = 2:totFrames
+    [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),0, 0,video(:,:,i),0, 0,'LS' );
+end
+
+% Smoothning and finding the final translation of each frames from its stable position
+a= 1:totFrames;
+smoothtx=mySmoothMotion(tx);
+smoothty=mySmoothMotion(ty);
+plot(a,tx,a,smoothtx);title('tx');
+figure();plot(a,ty,a,smoothty);title('ty');
+
+txfinal=tx;tyfinal=ty;
+txfinal(:)=0;tyfinal(:)=0;
+for i = 2:totFrames
+    txfinal(i)=tx(i)-smoothtx(i)+txfinal(i-1);
+    tyfinal(i)=ty(i)-smoothty(i)+tyfinal(i-1);
+end
+txfinal=round(txfinal);tyfinal=round(tyfinal);
+
+
+% Forming stablized video
+[H,W]=size(video(:,:,1));
+for i  = 1:totFrames
+    d = video(:,:,i); d(:,:) = 0;
+    d(max(1,1-tyfinal(i)):min(H-tyfinal(i),H),max(1,1-txfinal(i)):min(W-txfinal(i),W)) = ...
+    video(max(1,1+tyfinal(i)):min(H,H+tyfinal(i)),max(1,1+txfinal(i)):min(W,W+txfinal(i)),i);
+    stablized_video(:,:,i) = d;
+end
+% filename = '..\report\stablizedTranslation\stablized_cars_RANSAC.avi';
+filename = '..\report\stablizedTranslation\stablized_cars_LS.avi';
+bothvideo = zeros(inVideo.height, 2*inVideo.width, totFrames);
+bothvideo(:,1:W,:)=video(:,:,:);
+bothvideo(:,W+1:2*W,:)=stablized_video(:,:,:);
+writevideo(filename,bothvideo/max(bothvideo(:)),framerate);
+toc;
+
+%% Coastguard
+tic;
+%* Reading video*
+inVideo = mmread('..\data\shakyTranslation\shaky_coastguard.avi');
+totFrames = inVideo.nrFramesTotal;
+framerate = inVideo.rate;
+video = zeros(inVideo.height, inVideo.width, totFrames);
+stablized_video = zeros(inVideo.height, inVideo.width, totFrames);
+% cdata       [height X width X 3] uint8 matricies
+for i  = 1:totFrames
+    video(:,:,i) = inVideo.frames(i).cdata(:,:,1);
+end
+
+% Finding the translational motion model
+tx = zeros(1,totFrames);
+ty = zeros(1,totFrames);
+
+% Using RANSAC
+% [ des1, loc1] = sift(video(:,:,1));
+% for i = 2:totFrames
+%     [ des2, loc2] = sift(video(:,:,i));
+%     [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),des1, loc1,video(:,:,i),des2, loc2,'RANSAC' );
+%     des1=des2; loc1=loc2;
+% end
+
+% Using Least Square
+for i = 2:totFrames
+    [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),0, 0,video(:,:,i),0, 0,'LS' );
+end
+
+% Smoothning and finding the final translation of each frames from its stable position
+a= 1:totFrames;
+smoothtx=mySmoothMotion(tx);
+smoothty=mySmoothMotion(ty);
+plot(a,tx,a,smoothtx);title('tx');
+figure();plot(a,ty,a,smoothty);title('ty');
+
+txfinal=tx;tyfinal=ty;
+txfinal(:)=0;tyfinal(:)=0;
+for i = 2:totFrames
+    txfinal(i)=tx(i)-smoothtx(i)+txfinal(i-1);
+    tyfinal(i)=ty(i)-smoothty(i)+tyfinal(i-1);
+end
+txfinal=round(txfinal);tyfinal=round(tyfinal);
+
+
+% Forming stablized video
+[H,W]=size(video(:,:,1));
+for i  = 1:totFrames
+    d = video(:,:,i); d(:,:) = 0;
+    d(max(1,1-tyfinal(i)):min(H-tyfinal(i),H),max(1,1-txfinal(i)):min(W-txfinal(i),W)) = ...
+    video(max(1,1+tyfinal(i)):min(H,H+tyfinal(i)),max(1,1+txfinal(i)):min(W,W+txfinal(i)),i);
+    stablized_video(:,:,i) = d;
+end
+% filename = '..\report\stablizedTranslation\stablized_coastguard_RANSAC.avi';
+filename = '..\report\stablizedTranslation\stablized_coastguard_LS.avi';
+bothvideo = zeros(inVideo.height, 2*inVideo.width, totFrames);
+bothvideo(:,1:W,:)=video(:,:,:);
+bothvideo(:,W+1:2*W,:)=stablized_video(:,:,:);
+writevideo(filename,bothvideo/max(bothvideo(:)),framerate);
+toc;
+
+%% gbus
+tic;
+%* Reading video*
+inVideo = mmread('..\data\shakyTranslation\shaky_gbus.avi');
+totFrames = inVideo.nrFramesTotal;
+framerate = inVideo.rate;
+video = zeros(inVideo.height, inVideo.width, totFrames);
+stablized_video = zeros(inVideo.height, inVideo.width, totFrames);
+% cdata       [height X width X 3] uint8 matricies
+for i  = 1:totFrames
+    video(:,:,i) = inVideo.frames(i).cdata(:,:,1);
+end
+
+% Finding the translational motion model
+tx = zeros(1,totFrames);
+ty = zeros(1,totFrames);
+
+% Using RANSAC
+% [ des1, loc1] = sift(video(:,:,1));
+% for i = 2:totFrames
+%     [ des2, loc2] = sift(video(:,:,i));
+%     [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),des1, loc1,video(:,:,i),des2, loc2,'RANSAC' );
+%     des1=des2; loc1=loc2;
+% end
+
+% Using Least Square
+for i = 2:totFrames
+    [tx(i),ty(i)] = fitTranslation(video(:,:,i-1),0, 0,video(:,:,i),0, 0,'LS' );
+end
+
+% Smoothning and finding the final translation of each frames from its stable position
+a= 1:totFrames;
+smoothtx=mySmoothMotion(tx);
+smoothty=mySmoothMotion(ty);
+plot(a,tx,a,smoothtx);title('tx');
+figure();plot(a,ty,a,smoothty);title('ty');
+
+txfinal=tx;tyfinal=ty;
+txfinal(:)=0;tyfinal(:)=0;
+for i = 2:totFrames
+    txfinal(i)=tx(i)-smoothtx(i)+txfinal(i-1);
+    tyfinal(i)=ty(i)-smoothty(i)+tyfinal(i-1);
+end
+txfinal=round(txfinal);tyfinal=round(tyfinal);
+
+
+% Forming stablized video
+[H,W]=size(video(:,:,1));
+for i  = 1:totFrames
+    d = video(:,:,i); d(:,:) = 0;
+    d(max(1,1-tyfinal(i)):min(H-tyfinal(i),H),max(1,1-txfinal(i)):min(W-txfinal(i),W)) = ...
+    video(max(1,1+tyfinal(i)):min(H,H+tyfinal(i)),max(1,1+txfinal(i)):min(W,W+txfinal(i)),i);
+    stablized_video(:,:,i) = d;
+end
+%filename = '..\report\stablizedTranslation\stablized_gbus_RANSAC.avi';
+filename = '..\report\stablizedTranslation\stablized_gbus_LS.avi';
+bothvideo = zeros(inVideo.height, 2*inVideo.width, totFrames);
+bothvideo(:,1:W,:)=video(:,:,:);
+bothvideo(:,W+1:2*W,:)=stablized_video(:,:,:);
+writevideo(filename,bothvideo/max(bothvideo(:)),framerate);
+toc;
+% Motion can be modelled in 3 ways
+% fitTranslation -> It will return tx & ty only
+% fitTranslation_Rotation -> It will return theta, tx & ty
+% fitAffine -> 3x3 matrix
+
+toc;
+##### SOURCE END #####
+--></body></html>
