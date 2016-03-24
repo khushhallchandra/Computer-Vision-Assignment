@@ -1,7 +1,7 @@
 % This function is used for loading dataset
 % It takes an input of the form
 % partA, partB, partC, partD
-function [X_train,Y_train,X_test,Y_test] = loadData(part)
+function [X_train, Y_train, X_test, Y_test] = loadData(part)
 	n=2000;
 	X = rand(n,2);
 	Y = -1*ones(n,1);
@@ -24,11 +24,10 @@ function [X_train,Y_train,X_test,Y_test] = loadData(part)
 	elseif(part == 'partD')
 		
 		dist = sqrt(X(:,1).^2 + X(:,2).^2);		
-		Y( (dist <= 2) | (distance >= 2.5 & distance <= 3) ) = 1;
+		Y( (dist <= 2) | (dist >= 2.5 & dist <= 3) ) = 1;
 	end
 
-    % dividing the data in two parts
-   
+    % dividing the data in two parts   
     split = n/2;
 	% series -> to randomly select from the dataset
     series = randperm(n);
