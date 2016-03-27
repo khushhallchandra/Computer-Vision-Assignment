@@ -17,16 +17,36 @@ function [X_train, Y_train, X_test, Y_test] = loadData(part)
     	Y( (X(:,2)>=0.15 & X(:,2)<=0.25) | (X(:,2)>=0.75 & X(:,2)<=0.85) ) = 1;
 
 	elseif(part == 'partC')
-	
-		dist = sqrt( X(:,1).^2 + X(:,2).^2);		
+
+		X = normrnd(0, 2, n, 2);
+		dist = sqrt(X(:,1).^2 + X(:,2).^2);		
 		Y(dist <= 2) = 1;
 
 	elseif(part == 'partD')
-		
+
+		X = normrnd(0, 2, n, 2);
 		dist = sqrt(X(:,1).^2 + X(:,2).^2);		
 		Y( (dist <= 2) | (dist >= 2.5 & dist <= 3) ) = 1;
-	end
+	
 
+	elseif(part == 'partE')
+		
+		[I,labels,~,~] = readMNIST();
+		z = I(1,1:5000);
+		len = size(z{1},1)*size(z{1},2);
+		X_train = zeros([size(z,2) len]);
+		for i=1:size(z,2)
+			X_train(i,:)=reshape(z{i}',1,len);
+		end		
+		Y_train = double(labels(1:5000,:));
+		check = (Y_train == 2);
+		Y_train(~check) = -1;
+		Y_train(check) = 1;
+		X_test = 0;
+		Y_test = 0;
+		return
+	end
+	
     % dividing the data in two parts   
     split = n/2;
 	% series -> to randomly select from the dataset
