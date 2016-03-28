@@ -1,0 +1,368 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>myMainScript</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-03-27"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Load Dataset</a></li><li><a href="#3">Find best classifier with current weights</a></li></ul></div><pre class="codeinput">tic;
+</pre><h2>Load Dataset<a name="2"></a></h2><pre class="codeinput">[X_train, Y_train, X_test, Y_test] = loadData(<span class="string">'partA'</span>);
+
+<span class="comment">%%Plot the data</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+figure();
+plus = X_train(Y_train == 1,:);
+minus = X_train(Y_train == -1,:);
+scatter(plus(:,1),plus(:,2),<span class="string">'b'</span>)
+hold <span class="string">on</span>
+scatter(minus(:,1),minus(:,2),<span class="string">'r'</span>)
+legend(<span class="string">'+1'</span>,<span class="string">'-1'</span>)
+title(<span class="string">'Plot of training data'</span>);
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<img vspace="5" hspace="5" src="scatter.png" alt="">
+epoch = 40;
+<span class="comment">%(i, p, theta)</span>
+i = zeros(epoch,1);
+p = zeros(epoch,1);
+theta = zeros(epoch,1);
+alpha = zeros(epoch,1);
+weight = ones(size(Y_train))/size(Y_train,1);
+train_error = zeros(epoch,1);
+test_error = zeros(epoch,1);
+
+<span class="keyword">for</span> t = 1:epoch
+</pre><h2>Find best classifier with current weights<a name="3"></a></h2><pre class="codeinput">    epsilon = 1;
+    <span class="keyword">for</span> j = 1:size(X_train,2)
+        c = unique(X_train(:,j));
+        <span class="keyword">for</span> k =1:length(c)
+            th = c(k);
+<span class="comment">%         for k =1:size(X_train,1)</span>
+<span class="comment">%             th = X_train(k,j);</span>
+			<span class="comment">% Counting the number of mismatches</span>
+            error = sum(weight.*( Y_train ~= sign( (X_train(:,j) - th) + ~logical(X_train(:,j) - th)) ));
+            pTest = 1;
+            <span class="keyword">if</span> error &gt; 0.5
+                error = 1 - error;
+                pTest = -1;
+            <span class="keyword">end</span>
+
+            <span class="keyword">if</span> error &lt; epsilon
+                epsilon = error;
+                i(t) = j;
+                theta(t) = th;
+                p(t) = pTest;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">% Updating the weights</span>
+    alpha(t) = 0.5*log((1-epsilon)/epsilon);
+    label = (Y_train ~= sign(p(t)*(X_train(:,i(t)) - theta(t))));
+    weight(label) = weight(label)*exp(alpha(t));
+    weight(~label) = weight(~label)*exp(-alpha(t));
+    weight = weight/sum(weight);
+</pre><pre class="codeinput"><span class="comment">	%% Calculating the errors</span>
+
+	<span class="comment">% estimate and print the training error(in percent)</span>
+	<span class="comment">% of the strong classifier created thus far</span>
+	fprintf(<span class="string">'Iteration = %d \n'</span>,t);
+	Y_train_predicted = zeros(size(Y_train));
+	<span class="keyword">for</span> k = 1:t
+		Y_train_predicted = Y_train_predicted+ alpha(k)*sign(p(k)*(X_train(:,i(k)) - theta(k)));
+	<span class="keyword">end</span>
+	Y_train_predicted = sign(Y_train_predicted);
+	train_error(t) = sum(Y_train ~= Y_train_predicted)*100/length(Y_train);
+	fprintf(<span class="string">'Training error = %d \n'</span>,train_error(t));
+	<span class="comment">% estimate and print the test error(in percent) of</span>
+	<span class="comment">% the strong classifier created thus far</span>
+ 	Y_test_predicted = zeros(size(Y_test));
+ 	<span class="keyword">for</span> k = 1:t
+ 		Y_test_predicted = Y_test_predicted + alpha(k)*sign(p(k)*(X_test(:,i(k)) - theta(k)));
+ 	<span class="keyword">end</span>
+ 	Y_test_predicted = sign(Y_test_predicted);
+ 	test_error(t) = sum(Y_test ~= Y_test_predicted)*100/length(Y_test);
+	fprintf(<span class="string">'Test error = %d \n'</span>,test_error(t));
+</pre><pre class="codeoutput">Iteration = 1 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 2 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 3 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 4 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 5 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 6 
+Training error = 6.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 7 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 8 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 9 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 10 
+Training error = 6.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 11 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 12 
+Training error = 6.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 13 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 14 
+Training error = 6.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 15 
+Training error = 1.570000e+01 
+Test error = 1.650000e+01 
+</pre><pre class="codeoutput">Iteration = 16 
+Training error = 5.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 17 
+Training error = 6.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 18 
+Training error = 5.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 19 
+Training error = 6.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 20 
+Training error = 5.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 21 
+Training error = 6.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 22 
+Training error = 4.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 23 
+Training error = 5.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 24 
+Training error = 5.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 25 
+Training error = 4.000000e-01 
+Test error = 1 
+</pre><pre class="codeoutput">Iteration = 26 
+Training error = 9.000000e-01 
+Test error = 2.200000e+00 
+</pre><pre class="codeoutput">Iteration = 27 
+Training error = 4.000000e-01 
+Test error = 1.100000e+00 
+</pre><pre class="codeoutput">Iteration = 28 
+Training error = 1 
+Test error = 2.200000e+00 
+</pre><pre class="codeoutput">Iteration = 29 
+Training error = 2.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 30 
+Training error = 1.800000e+00 
+Test error = 2.400000e+00 
+</pre><pre class="codeoutput">Iteration = 31 
+Training error = 2.000000e-01 
+Test error = 1.200000e+00 
+</pre><pre class="codeoutput">Iteration = 32 
+Training error = 1.100000e+00 
+Test error = 1.400000e+00 
+</pre><pre class="codeoutput">Iteration = 33 
+Training error = 1.100000e+00 
+Test error = 1.400000e+00 
+</pre><pre class="codeoutput">Iteration = 34 
+Training error = 4.000000e-01 
+Test error = 1.100000e+00 
+</pre><pre class="codeoutput">Iteration = 35 
+Training error = 1.100000e+00 
+Test error = 1.400000e+00 
+</pre><pre class="codeoutput">Iteration = 36 
+Training error = 4.000000e-01 
+Test error = 1.100000e+00 
+</pre><pre class="codeoutput">Iteration = 37 
+Training error = 1.200000e+00 
+Test error = 1.400000e+00 
+</pre><pre class="codeoutput">Iteration = 38 
+Training error = 4.000000e-01 
+Test error = 1.100000e+00 
+</pre><pre class="codeoutput">Iteration = 39 
+Training error = 1.200000e+00 
+Test error = 1.400000e+00 
+</pre><pre class="codeoutput">Iteration = 40 
+Training error = 5.000000e-01 
+Test error = 1.100000e+00 
+</pre><pre class="codeinput"><span class="keyword">end</span>
+figure();
+plot(train_error,<span class="string">'r'</span>);
+hold <span class="string">on</span>
+plot(test_error,<span class="string">'b'</span>);
+xlabel(<span class="string">'No. of iterations '</span>)
+ylabel(<span class="string">'% Error'</span>)
+legend(<span class="string">'training error'</span>,<span class="string">'test error'</span>)
+title(<span class="string">'Plot of training error and test error'</span>);
+toc;
+</pre><img vspace="5" hspace="5" src="error.png" alt=""><pre class="codeoutput">Elapsed time is 6.730913 seconds.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+tic;
+%% Load Dataset
+[X_train, Y_train, X_test, Y_test] = loadData('partA');
+
+%%Plot the data
+%%%%%%%%%%%%%%%%%%%%%%%%%
+figure();
+plus = X_train(Y_train == 1,:);
+minus = X_train(Y_train == -1,:);
+scatter(plus(:,1),plus(:,2),'b')
+hold on
+scatter(minus(:,1),minus(:,2),'r')
+legend('+1','-1')
+title('Plot of training data');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+epoch = 40;
+%(i, p, theta)
+i = zeros(epoch,1);
+p = zeros(epoch,1);
+theta = zeros(epoch,1);
+alpha = zeros(epoch,1);
+weight = ones(size(Y_train))/size(Y_train,1);
+train_error = zeros(epoch,1);
+test_error = zeros(epoch,1);
+
+for t = 1:epoch
+    %% Find best classifier with current weights
+    epsilon = 1;
+    for j = 1:size(X_train,2)
+        c = unique(X_train(:,j));
+        for k =1:length(c)		
+            th = c(k);
+%         for k =1:size(X_train,1)
+%             th = X_train(k,j);
+			% Counting the number of mismatches
+            error = sum(weight.*( Y_train ~= sign( (X_train(:,j) - th) + ~logical(X_train(:,j) - th)) ));
+            pTest = 1;
+            if error > 0.5
+                error = 1 - error;
+                pTest = -1;
+            end
+            
+            if error < epsilon
+                epsilon = error;
+                i(t) = j;
+                theta(t) = th;
+                p(t) = pTest;
+            end
+        end
+    end
+    % Updating the weights
+    alpha(t) = 0.5*log((1-epsilon)/epsilon);
+    label = (Y_train ~= sign(p(t)*(X_train(:,i(t)) - theta(t))));    
+    weight(label) = weight(label)*exp(alpha(t));
+    weight(~label) = weight(~label)*exp(-alpha(t));    
+    weight = weight/sum(weight);
+
+	%% Calculating the errors
+	
+	% estimate and print the training error 
+	% of the strong classifier created thus far  
+	fprintf('Iteration = %d \n',t); 
+	Y_train_predicted = zeros(size(Y_train));
+	for k = 1:t
+		Y_train_predicted = Y_train_predicted+ alpha(k)*sign(p(k)*(X_train(:,i(k)) - theta(k)));
+	end
+	Y_train_predicted = sign(Y_train_predicted);
+	train_error(t) = sum(Y_train ~= Y_train_predicted)*100/length(Y_train); 	
+	fprintf('Training error = %d \n',train_error(t));
+	% estimate and print the test error of 
+	% the strong classifier created thus far 
+ 	Y_test_predicted = zeros(size(Y_test));
+ 	for k = 1:t
+ 		Y_test_predicted = Y_test_predicted + alpha(k)*sign(p(k)*(X_test(:,i(k)) - theta(k)));
+ 	end
+ 	Y_test_predicted = sign(Y_test_predicted);
+ 	test_error(t) = sum(Y_test ~= Y_test_predicted)*100/length(Y_test);
+	fprintf('Test error = %d \n',test_error(t));
+end
+figure();
+plot(train_error,'r');
+hold on
+plot(test_error,'b');
+xlabel('No. of iterations ')
+ylabel('% Error')
+legend('training error','test error')
+title('Plot of training error and test error');
+toc;
+
+##### SOURCE END #####
+--></body></html>
