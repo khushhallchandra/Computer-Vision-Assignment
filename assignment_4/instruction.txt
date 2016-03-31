@@ -1,0 +1,7 @@
+Folder 1 
+code - It contains the source code and the written explaination for partd.
+report - It contains report for part a to e.
+
+Folder 2
+Answers for Q2.
+
