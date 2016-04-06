@@ -1,0 +1,98 @@
+\title{Assignment 5: CS 763, Computer Vision}
+\author{}
+\date{Due 15th April before 11:55 pm (no late submissions will be allowed this time)}
+
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,cancel}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{ulem,color}
+\usepackage[margin=0.5in]{geometry}
+\begin{document}
+\maketitle
+
+\textbf{Remember the honor code while submitting this (and every other) assignment. You may discuss broad ideas with other student groups or ask me for any difficulties, but the code you implement and the answers you write must be from members of the group. We will adopt a \textbf{zero-tolerance policy} against any violation.}
+\\
+\\
+\textbf{Submission instructions:} You should ideally type out all the answers in Word (with the equation editor) or using Latex. In either case, prepare a pdf file. Put the pdf file and the code for the programming parts all in one zip file. The pdf file should contain instructions for running your code. Name the zip file as follows: A5-IdNumberOfFirstStudent-IdNumberOfSecondStudent.zip. If you are doing the assignment alone, the name of the zip file should be A5-IdNumber.zip. Upload the file on moodle BEFORE 11:59 pm on 15th April. \textbf{No late submissions will be allowed this time. You will lose all the points for this assignment if you submit the solutions later than the deadline}. Please preserve a copy of all your work until the end of the semester. 
+
+\begin{enumerate}
+\item Answer the following questions pertaining to the essential/fundamental matrix in a binocular stereo system:
+\begin{enumerate}
+\item Consider two cameras with parallel optical axes, with the optical center of the second camera at a location $(a,0,0)$ as measured in the first camera's coordinate frame. What is the essential matrix of this stereo system? 
+\item Suppose I gave you the fundamental matrix of a stereo system, how will you infer the left and right epipoles in pixel coordinates? 
+\item Prove that any essential matrix will have one singular value which is zero, and that its other two singular values are identical. Derive a relationship between these singular values and the extrinsic parameters of the stereo system (\textit{i.e.}, the rotation matrix $\textbf{R}$ and/or the translation vector $\textbf{t}$ between the coordinate frames of the two cameras). [Hint: Show that if $\textbf{E}$ is the essential matrix, then we can write $\textbf{E}^T \textbf{E} = \alpha (\textbf{I}_{3 \times 3} - \textbf{t}_\textbf{u} \textbf{t}^T_\textbf{u})$ where $\alpha$ is some scalar which you should express in terms of $\textbf{R}$ and/or $\textbf{t}$, $\textbf{I}_{3 \times 3}$  is the identity matrix with 3 rows and 3 columns, and $\textbf{t}_\textbf{u}$ is a vector of unit magnitude in the direction of $\textbf{t}$]. 
+\item In the noiseless case, what is the minimum number of corresponding pairs of points you must know in order to estimate the essential matrix? Or in other words, how many degrees of freedom does an essential matrix have? Justify your answer. (Think carefully). 
+\item We have studied the eight-point algorithm in class for estimating the essential/fundamental matrix. There exist algorithms that require only 7 pairs of corresponding points. In robust estimation, what main advantage will a 7-point algorithm have over the 8-point version? 
+\end{enumerate}
+\textsf{[1 + 1 + 5 + 1 + 2 = 10 points]}
+
+\item A very beautiful aspect of compressive sensing is the rigorous mathematical basis - in the form of concrete error bounds on reconstruction results. While using regularization to solve ill-posed problems is a known technique in computer vision and image processing, the existence of error bounds is a unique feature for compressive sensing problems. What is more, the proof of these stunning results is actually not super-hard, and any (motivated) graduate or undergraduate student with a basic knowledge of properties of vectors, and (more than) a little bit of patience, can easily follow the proofs. The purpose of this exercise is to take you through the proof of the following theorem proved by Emmanuel Candes: \textsf{[20 points]}
+\\
+\textbf{Theorem:} Let $\mathbf{y} = \mathbf{Ax}+\mathbf{\eta}$ be a vector of noisy compressed measurements where the matrix $\mathbf{A} \in \mathbb{R}^{m \times n},  m \ll n$ has restricted isometry constant $\delta_{2s} < \sqrt{2}-1$. Let the noise magnitude be upper bounded as $\|\mathbf{\eta}\|_2 \leq \epsilon$. Let $\mathbf{x}^{\star}$ be the solution to the problem $\textrm{min}_{\mathbf{x}} \|\mathbf{x}\|_1$ such that $\|\mathbf{y} - \mathbf{Af}\|_2 \leq \epsilon$. Then $\mathbf{x^{\star}}$ obeys 
+$\|\mathbf{x^{\star} - x}\|_2 \leq C_0 s^{-1/2}\|\mathbf{x - x_s}\|_1  + C_1 \epsilon$ where $C_0$ and $C_1$ are small-valued constants and $\mathbf{x_s}$ is a vector obtained by nullifying all entries of $\mathbf{x}$ except the $s$ entries with the largest absolute value. 
+\\
+\\
+The proof is given below. Your job is to trace through it, verifying every step, and then answering the questions presented in blue colored font. \emph{Ideally, edit the latex file itself and write your answer in blue colored font}.
+You will need to use the following properties assuming vectors $\mathbf{x}$, $\mathbf{y}$: the triangle inequality ($\|\mathbf{x}\|_2 + \|\mathbf{y}\|_2 \geq \|\mathbf{x}+\mathbf{y}\|_2$), the reverse triangle inequality ($\|\mathbf{x}-\mathbf{y}\|_2 \geq \|\mathbf{x}\|_2 - \|\mathbf{y}\|_2$), the Cauchy-Schwartz inequality (the dot product $|\langle \mathbf{x}, \mathbf{y} \rangle| \leq \|\mathbf{x}\|_2 \|\mathbf{y}\|_2$) for vectors $\mathbf{x}$ and $\mathbf{y}$, and the restricted isometry property for $\mathbf{A}$. Also remember that $\|\mathbf{x}\|_1 = \sum_i |x_i|$, $\|\mathbf{x}\|_2 = \sqrt{\sum_i x^2_i}$ and $\|\mathbf{x}\|_{\infty} = \textrm{max}_i |x_i|$.
+\\
+\\
+\textbf{Proof:}
+\\
+\begin{enumerate}
+\item We can write the following result: $\|\mathbf{A(x-x^{\star})}\|_2 \leq 2\epsilon$. \textcolor{blue}{(How is this derived?)}
+\item Let us define vector $\mathbf{h} = \mathbf{x^{\star}-x}$. Let us denote vector $\mathbf{h_T}$ as the vector equal to $\mathbf{h}$ only on an index set $T$ and zero at all other indices. Let $T_0$ the set of indices containing the $s$ largest entries of $\mathbf{x}$ (in terms of absolute value), $T_1$ be the set of indices of the $s$ largest entries of $\mathbf{h}_{T^c_0}$, $T_2$ be the set of indices of the next $s$ largest entries of $\mathbf{h}_{T^c_0}$ after $T_1$, and so on. We will now decompose $\mathbf{h}$ as the sum of $\mathbf{h_{T_0}}, \mathbf{h_{T_1}}, \mathbf{h_{T_2}}, ...$. We will denote the complement of an index set $T$ as $T^c$. Our aim will be to prove that both $\|\mathbf{h_{T_0 \cup T_1}}\|_2$ and $\|\mathbf{h_{(T_0 \cup T_1)^c}}\|_2$ are upper bounded by sensible and intuitive quantities. 
+\item We will first prove the bound on $\|\mathbf{h}_{(T_0 \cup T_1)^c}\|_2$, in the following way, using simple vector properties and the fact that $\mathbf{x+h}$ is the minimum of the objective function subject to the given constraint. 
+\begin{enumerate}
+\item We have $\|\mathbf{h}_{T_j}\|_2 \leq s^{1/2} \|\mathbf{h}_{T_j}\|_\infty \leq s^{-1/2} \|\mathbf{h}_{T_{j-1}}\|_1$. \textcolor{blue}{(Prove both these inequalities. Note that any element of $T_{j-1}$ is greater than or equal to any element of $T_j$ for any $j \geq 1$)}. 
+\item Therefore $\sum_{j \geq 2}\|\mathbf{h}_{T_j}\|_2 \leq s^{-1/2} \|\mathbf{h}_{(T_0)^c}\|_1$. \textcolor{blue}{(Prove this inequality)}. 
+\item Hence we have $\|\mathbf{h}_{(T_0 \cup T_1)^c}\|_2 = \|\sum_{j \geq 2} \mathbf{h}_{T_j}\|_2 \leq \sum_{j \geq 2} \|\mathbf{h}_{T_j}\|_2 \leq s^{-1/2} \|\mathbf{h}_{(T_0)^c}\|_1$ (\textcolor{blue}{Prove both inequalities}).
+\item Now it turns out that $\|\mathbf{h}_{(T_0)^c}\|_1$ is not very large in value. Why so? As $\mathbf{x}^{\star}$ is the minimum, we have $\|\mathbf{x}\|_1 \geq \|\mathbf{x}+\mathbf{h}\|_1 = \sum_{i \in T_0} |x_i + h_i| + \sum_{i \in {(T_0)}^c} |x_i + h_i| \geq \|\mathbf{x}_{T_0}\|_1 - \|\mathbf{h}_{T_0}\|_1 + \|\mathbf{h}_{{(T_0)}^c}\|_1 - \|\mathbf{x}_{{(T_0)^c}}\|_1$ \textcolor{blue}{Prove the last inequality}. 
+\item Rearranging the terms now gives us $\|\mathbf{h}_{{(T_0)}^c}\|_1 \leq \|\mathbf{h}_{{(T_0)}}\|_1  + 2\|\mathbf{x}_{{(T_0)^c}}\|_1 = \|\mathbf{h}_{{(T_0)}}\|_1  + 2\|\mathbf{x}-\mathbf{x_s}\|_1$. 
+\item Combining everything, we now have $\|\mathbf{h}_{(T_0 \cup T_1)^c}\|_2 \leq s^{-1/2}(\|\mathbf{h}_{{(T_0)}}\|_1  + 2\|\mathbf{x}-\mathbf{x_s}\|_1) \leq \|\mathbf{h}_{{(T_0)}}\|_2 + 2s^{-1/2} \|\mathbf{x}-\mathbf{x_s}\|_1$. \textcolor{blue}{(Prove the last inequality).}
+\end{enumerate}
+\item We will now prove the bound on $\|\mathbf{h}_{(T_0 \cup T_1)}\|_2$, in the following way. 
+\begin{enumerate}
+\item We observe that $\mathbf{Ah_{T_0 \cup T_1}} = \mathbf{Ah} - \sum_{j \geq 2} \mathbf{Ah_{T_j}}$. \\
+Hence $\|\mathbf{Ah_{T_0 \cup T_1}}\|^2_2 = \langle \mathbf{Ah_{T_0 \cup T_1}} , \mathbf{Ah}\rangle - \langle \mathbf{Ah_{T_0 \cup T_1}} , \sum_{j \geq 2} \mathbf{Ah_{T_j}}\rangle$.
+\item Now, we have $|\langle \mathbf{Ah}_{T_0 \cup T_1} , \mathbf{Ah}\rangle| \leq \|\mathbf{Ah}_{T_0 \cup T_1}\|_2 \|\mathbf{Ah}\|_2 \leq 2 \epsilon \sqrt{1 + \delta_{2s}} \|\mathbf{h}_{T_0 \cup T_1}\|_2$ \textcolor{blue}{(Prove both these inequalities, one of which uses the restricted isometry property of $\mathbf{A}$)}. 
+\item We also have $|\langle \mathbf{Ah}_{T_0}, \mathbf{Ah}_{T_j}\rangle| \leq \delta_{2s} \|\mathbf{h}_{T_0}\|_2 \|\mathbf{h}_{T_j}\|_2$. To prove this, observe that $\mathbf{h_{T_0}}$ and $\mathbf{h_{T_j}}$ are vectors with disjoint support. $|\langle \mathbf{Ah}_{T_0}, \mathbf{Ah}_{T_j}\rangle| = \|\mathbf{h}_{T_0}\|_2 \|\mathbf{h}_{T_j}\|_2|\langle \mathbf{A\hat{h}}_{T_0}, \mathbf{A\hat{h}}_{T_j}\rangle|$  where $\mathbf{\hat{h}_{T_0}}$ and $\mathbf{\hat{h}_{T_j}}$ are unit-normalized vectors. This further yields $|\langle \mathbf{Ah}_{T_0}, \mathbf{Ah}_{T_j}\rangle|=\|\mathbf{h}_{T_0}\|_2 \|\mathbf{h}_{T_j}\|_2 \frac{\|\mathbf{A}(\mathbf{\hat{h}_{T_0}}+\mathbf{\hat{h}_{T_j}})\|^2 - \|\mathbf{A}(\mathbf{\hat{h}_{T_0}}-\mathbf{\hat{h}_{T_j}})\|^2}{4} 
+\\ \leq \|\mathbf{h}_{T_0}\|_2 \|\mathbf{h}_{T_j}\|_2 \frac{(1+\delta_{2s})(\|\mathbf{h_{T_0}}\|^2+\|\mathbf{h_{T_j}}\|^2)-(1-\delta_{2s})(\|\mathbf{h_{T_0}}\|^2+\|\mathbf{h_{T_j}}\|^2)}{4} \\
+= \delta_{2s} \|\mathbf{h}_{T_0}\|_2 \|\mathbf{h}_{T_j}\|_2$. Analogously, $|\langle \mathbf{Ah}_{T_1}, \mathbf{Ah}_{T_j}\rangle| \leq \delta_{2s} \|\mathbf{h}_{T_1}\|_2 \|\mathbf{h}_{T_j}\|_2$. 
+\item Now, we have $(1-\delta_{2s})\|\mathbf{h}_{T_0 \cup T_1}\|^2_2 
+\leq \|\mathbf{Ah}_{T_0 \cup T_1}\|^2_2 \leq 2 \epsilon \sqrt{1+\delta_{2s}}\|\mathbf{h}_{T_0 \cup T_1}\|_2 + \delta_{2s}(\|\mathbf{h}_{T_0}\|_2 + \|\mathbf{h}_{T_1}\|_2) \sum_{j \geq 2} \|\mathbf{h}_{T_j}\|_2$. \textcolor{blue}{(Prove this).} Furthermore, we can write $(1-\delta_{2s})\|\mathbf{h}_{T_0 \cup T_1}\|^2_2  \leq \|\mathbf{h}_{T_0 \cup T_1}\|_2(2\epsilon\sqrt{1+2\delta_{2s}}) + \sqrt{2}\delta_{2s} \sum_{j \geq 2} \|\mathbf{h}_{T_j}\|_2)$ because $\mathbf{h}_{T_0}$ and $\mathbf{h}_{T_1}$ are vectors with disjoint sets of non-zero indices and hence $\|\mathbf{h}_{T_0}\|_2 + \|\mathbf{h}_{T_1}\|_2 \leq \sqrt{2} \|\mathbf{h}_{T_0 \cup T_1}\|_2$.
+\item Rearranging the above equation, and using one of the previous results (\textcolor{blue}{which one?}), 
+we get $\|\mathbf{h}_{T_0 \cup T_1}\|_2 \leq \epsilon \dfrac{2\sqrt{1+\delta_{2s}}}{1-\delta_{2s}} + \dfrac{\sqrt{2}\sqrt{\delta_{2s}}}{1-\delta_{2s}} s^{-1/2} \|\mathbf{h}_{(T_0)^c}\|_1 
+\\ \leq \epsilon \dfrac{2\sqrt{1+\delta_{2s}}}{1-\delta_{2s}} + \dfrac{\sqrt{2}\delta_{2s}}{1-\delta_{2s}} \|\mathbf{h}_{T_0 \cup T_1}\|_2 + \dfrac{\sqrt{2}\delta_{2s}} {1-\delta_{2s}} s^{-1/2} \|\mathbf{x}-\mathbf{x_s}\|_1$. \\
+Further rearranging gives us
+$\|\mathbf{h}_{T_0 \cup T_1}\|_2  \leq C' \epsilon + C'' s^{-1/2} \|\mathbf{x}-\mathbf{x_s}\|_1$ where $C'$ and $C''$ are constants that depend only on $\delta_{2s}$ (note in particular that they do not depend on $n$).
+\end{enumerate}
+\item Now, we combine the upper bounds on $\|\mathbf{h}_{(T_0 \cup T_1)}\|_2$ and $\|\mathbf{h}_{(T_0 \cup T_1)^c}\|_2$ to yield the final result as follows: \\
+$\|\mathbf{h}\|_2 \leq \|\mathbf{h}_{T_0 \cup T_1}\|_2 + \|\mathbf{h}_{(T_0 \cup T_1)^c}\|_2 \leq \|\mathbf{h}_{T_0 \cup T_1}\|_2 + \|h_{T_0}\|_2 + 2s^{-1/2}\|\mathbf{x}-\mathbf{x_s}\|_1 \\
+\leq 2 \|\mathbf{h}_{T_0 \cup T_1}\|_2 + 2s^{-1/2}\|\mathbf{x}-\mathbf{x_s}\|_1 \leq C_0 s^{-1/2} \|\mathbf{x}-\mathbf{x_s}\|_1 + C_1 \epsilon$ \textcolor{blue}{(Justify all these inequalities. Write the final expression for $C_0$ and $C_1$ and explain where the sufficient condition $\delta_{2s} \leq \sqrt{2}-1$ arises)}.
+\end{enumerate}
+
+\item In this section, you will implement the orthogonal matching pursuit (OMP) algorithm for reconstruction from compressive measurements. For this, first extract all overlapping patches of size $8 \times 8$ from the barbara image in the homework folder. Generate a $n \times n$ matrix $\mathbf{\Phi}$ where $n = 64$ with all entries sampled from a zero-mean Gaussian distribution of unit standard deviation. Let $\mathbf{\Phi}_m$ denote a submatrix consisting of the first $m$ ($m \leq n$) rows of $\mathbf{\Phi}$. 
+\\
+\\
+Generate compressive measurements for each patch in the form $\mathbf{y_i} = \mathbf{\Phi}_m \mathbf{x_i}$ where $i$ is a patch index. Add zero mean Gaussian noise with standard deviation = 0.05 times the mean absolute value of all elements from the (non-noisy) coded patches. Your job is to recover $\mathbf{x_i}$ given $\mathbf{y_i}$ and $\mathbf{\Phi}_m$ for all $i$ using OMP. Since image patches are not sparse in the spatial domain, but sparse (or compressible) in the DCT domain, we will represent each patch as $\mathbf{x_i} = \mathbf{U \theta_i}$ where $\mathbf{U}$ is the 2D DCT matrix , and recover $\mathbf{\theta_i}$ first, thereafter reconstructing $\mathbf{x_i} = \mathbf{U} \mathbf{\theta_i}$. The final image should be reconstructed by averaging the overlapping patches in a sliding window fashion. 
+\\
+\\
+You should repeat this experiment for $m = \textrm{ceiling}(fn)$ where $f \in \{0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0.05\}$ and record the mean squared patch error (MSPE) and mean squared image error (MSIE) each time. MSPE is given as the average of the mean squared error between the original and reconstructed patches. MSIE is the mean squared error between the original and reconstructed image. Plot a graph of both errors w.r.t. $m$. 
+\\
+\\
+Repeat this experiment but using pseudo-inverse (the backslash operator in MATLAB) instead of OMP and plot the same errors. Comment on your observations.
+\\
+\\
+\textsf{[20 points]}.
+\\
+\\
+(Important tip: Generate the 2D DCT matrix in MATLAB as follows: $U = kron(dctmtx(8)',dctmtx(8)')$ and \emph{not} as $U = dctmtx(64)'$. This is because the latter generates a 1D DCT matrix, and images are not sparse in that basis.)
+
+
+\end{enumerate}
+
+
+
+\end{document}
