@@ -1,5 +1,5 @@
-%% myMainScript1
-% Using omp
+%% myMainScript2
+% Using pseudo-inverse
 tic; 
 img = imread('../data/barbara256.png');
 [x,y] = size(img);
@@ -34,8 +34,8 @@ for l = 1:size(m_range,2)
     %dct matrix
     U = kron(dctmtx(pSize)',dctmtx(pSize)'); 
     A = phi_m*U;    
-    %% Apply OMP    
-    S_t = omp(Y,A,sd);
+    %% Take pseudo-inverse    
+    S_t = A\Y;
     patches0 = (U*S_t)';
         
     %% Stitch together the recovered patches
